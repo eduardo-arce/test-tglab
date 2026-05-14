@@ -19,11 +19,10 @@
 using RouletteGame.Models;
 using RouletteGame.Services;
 
-Console.WriteLine("Hello, World!");
+Console.WriteLine("Hello, World!\n");
 
 Console.WriteLine("=== JOGO DE ROLETA - APOSTAS MÚLTIPLAS ===\n");
 
-var service = new RouletteService();
 // Criar várias apostas para a mesma rodada
 
 var bets = new List<Bet>
@@ -35,31 +34,39 @@ var bets = new List<Bet>
 
 var rouletteService = new RouletteService();
 
+var prizeDraw = await rouletteService.PrizeDraw();
+
+Console.WriteLine("RESULTADO:");
+
+int count = 0;
 foreach (var bet in bets)
 {
     var result = 0;
     switch (bet.BetType)
     {
         case "0-36":
-            result = Convert.ToInt32(rouletteService.FullNumber(bet));
+            result = await rouletteService.FullNumber(bet, prizeDraw);
             break;
         case "1-12":
-            result = Convert.ToInt32(rouletteService.FullNumber(bet));
+            result = await rouletteService.OneToTwelve(bet, prizeDraw);
             break;
         case "13-24":
-            result = Convert.ToInt32(rouletteService.FullNumber(bet));
+            result = await rouletteService.ThirteenToTwentyFour(bet, prizeDraw);
             break;
         case "25-36":
-            result = Convert.ToInt32(rouletteService.FullNumber(bet));
+            result = await rouletteService.TwentyFiveToThirtySix(bet, prizeDraw);
             break;
         case "even":
-            result = Convert.ToInt32(rouletteService.IsEven(bet));
+            result = await rouletteService.IsEven(bet, prizeDraw);
             break;
         case "odd":
-            result = Convert.ToInt32(rouletteService.IsOdd(bet));
+            result = await rouletteService.IsOdd(bet, prizeDraw);
             break;
     }
 
-    Console.WriteLine($"{bet.Id} => Retorna: R$ {result}");
+    count += result;
 
+    Console.WriteLine($" User: {bet.Id} => Retorna: R$ {result}");
 }
+
+Console.WriteLine($"\nGain: R$ {bets.Sum(x => x.Amount) - count}");
